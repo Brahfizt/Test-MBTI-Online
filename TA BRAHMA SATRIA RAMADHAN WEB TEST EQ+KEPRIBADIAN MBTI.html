@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tes EQ & Kepribadian Komprehensif</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for result visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-xl font-bold shadow-md shadow-indigo-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 leading-tight">EQ & Kepribadian Analyzer</h1>
+                    <p class="text-xs text-slate-500">Dibuat Oleh Brahma Satria Ramadhan(06) 9IT5</p>
+                </div>
+            </div>
+            <div id="progress-indicator" class="hidden text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full">
+                Soal <span id="current-q-num">1</span> dari 60
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+
+        <!-- VIEW 1: WELCOME SCREEN -->
+        <section id="view-welcome" class="fade-in bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-10 mb-8">
+            <div class="max-w-2xl">
+                <span class="inline-block bg-indigo-50 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">Refleksi Diri Interaktif</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-4 tracking-tight">Kenali Kecerdasan Emosional & Profil Kepribadian Anda</h2>
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-6">
+                    Tes ini terdiri dari <strong>60 pernyataan</strong>: 30 soal untuk 5 pilar Kecerdasan Emosional (EQ) dan 30 soal untuk melihat kecenderungan kepribadian. Jawablah berdasarkan kebiasaan Anda, bukan berdasarkan jawaban yang dianggap paling ideal.
+                </p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <div class="text-indigo-600 font-bold text-lg mb-1">60 Soal</div>
+                        <div class="text-xs text-slate-500">30 soal EQ + 30 soal kepribadian, dengan skala 1–5.</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <div class="text-indigo-600 font-bold text-lg mb-1">5 Pilar EQ</div>
+                        <div class="text-xs text-slate-500">Self-awareness, self-regulation, motivasi, empati, & skill sosial.</div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <div class="text-indigo-600 font-bold text-lg mb-1">12-18 Menit</div>
+                        <div class="text-xs text-slate-500">Waktu pengerjaan rata-rata tanpa batas waktu ketat.</div>
+                    </div>
+                </div>
+
+                <button onclick="startQuiz()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-medium px-8 py-3.5 rounded-xl transition shadow-lg shadow-indigo-100 flex items-center justify-center space-x-2">
+                    <span>Mulai Tes Sekarang</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 2: QUIZ SCREEN -->
+        <section id="view-quiz" class="hidden fade-in">
+            <!-- Progress Bar -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-4 sm:p-6 mb-6 shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="category-badge" class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">Dimensi</span>
+                    <span id="progress-percent" class="text-xs font-semibold text-slate-500">0% Selesai</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div id="progress-bar-fill" class="bg-indigo-600 h-full transition-all duration-300 w-0"></div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-10 shadow-sm mb-6">
+                <h3 id="question-text" class="text-lg sm:text-xl font-semibold text-slate-900 mb-8 leading-snug">
+                    <!-- Dynamic Question Text -->
+                </h3>
+
+                <!-- Options List -->
+                <div id="options-container" class="space-y-3">
+                    <!-- Dynamic Options -->
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex items-center justify-between">
+                <button id="btn-prev" onclick="prevQuestion()" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-medium px-5 py-2.5 rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Sebelumnya</span>
+                </button>
+
+                <button id="btn-next" onclick="nextQuestion()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-2 shadow-md shadow-indigo-100">
+                    <span id="next-btn-text">Selanjutnya</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 3: RESULTS SCREEN -->
+        <section id="view-results" class="hidden fade-in space-y-6">
+            <!-- Top Summary Card -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100">
+                    <div>
+                        <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">Analisis Selesai</span>
+                        <h2 class="text-2xl font-bold text-slate-900 mt-2">Hasil Evaluasi EQ & Kepribadian</h2>
+                        <p class="text-xs text-slate-500 mt-1">Berdasarkan 60 pernyataan refleksi diri. Hasil ini hanya perkiraan dan bukan diagnosis atau tes psikologi resmi.</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="window.print()" class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            <span>Cetak / PDF</span>
+                        </button>
+                        <button onclick="resetQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-md shadow-indigo-100 flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            <span>Ulangi Tes</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Core Score & Type Highlights -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="bg-indigo-50/60 border border-indigo-100 rounded-2xl p-6 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Skor Total EQ</span>
+                            <div class="flex items-baseline space-x-2 mt-2">
+                                <span id="total-eq-score" class="text-4xl font-extrabold text-indigo-900">0</span>
+                                <span class="text-slate-500 font-medium text-sm">/ <span id="total-eq-max">150</span> Poin</span>
+                            </div>
+                            <p id="eq-level-desc" class="text-xs sm:text-sm text-slate-600 mt-3 leading-relaxed">
+                                Memproses deskripsi tingkat kecerdasan emosional Anda...
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-6 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Indikasi Karakter Kepribadian</span>
+                            <div class="mt-2 flex items-center space-x-3">
+                                <span id="personality-type-code" class="text-2xl font-extrabold text-slate-900 bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">INFJ</span>
+                                <span id="personality-type-name" class="text-sm font-semibold text-slate-700">The Advocate</span>
+                            </div>
+                            <p id="personality-summary-desc" class="text-xs sm:text-sm text-slate-600 mt-3 leading-relaxed">
+                                Memproses karakteristik tipe kepribadian Anda...
+                            </p>
+                            <div id="personality-breakdown" class="mt-5 space-y-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dimension Breakdown & Chart Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 5 Pillars Breakdown -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-900 mb-4 text-base">Rincian 5 Pilar EQ</h3>
+                        <div id="pillars-breakdown" class="space-y-4">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Radar Chart Container -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm flex flex-col items-center justify-center">
+                    <h3 class="font-bold text-slate-900 mb-2 self-start text-base">Grafik Profil Dimensi</h3>
+                    <div class="w-full h-64 relative flex items-center justify-center">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Analysis Breakdown -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 p-6 sm:p-8 shadow-sm">
+                <h3 class="font-bold text-slate-900 mb-3 text-base">Rekomendasi Pengembangan Diri</h3>
+                <div id="recommendation-text" class="text-sm text-slate-600 leading-relaxed space-y-3">
+                    <!-- Dynamic recommendations -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+        <p>&copy; 2026 Tes EQ & Kepribadian Interaktif. Alat refleksi diri edukatif; bukan alat diagnosis psikologis resmi.</p>
+    </footer>
+
+    <!-- Notification Dialog (Custom Alert Replacement) -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 max-w-sm w-full shadow-xl fade-in">
+            <h4 id="modal-title" class="font-bold text-slate-900 text-lg mb-2">Perhatian</h4>
+            <p id="modal-message" class="text-sm text-slate-600 mb-6">Pesan peringatan sistem.</p>
+            <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition">Mengerti</button>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        // 60 pernyataan: 30 untuk lima pilar EQ dan 30 untuk empat dimensi kepribadian.
+        const questions = [
+            // BAGIAN A — 30 soal EQ: enam soal untuk tiap pilar.
+            { id: 1, section: "EQ", category: "Kesadaran Diri", text: "Saya dapat mengenali emosi yang sedang saya rasakan saat emosi itu muncul.", trait: null },
+            { id: 2, section: "EQ", category: "Kesadaran Diri", text: "Saya memahami situasi atau hal yang biasanya memicu emosi tertentu pada diri saya.", trait: null },
+            { id: 3, section: "EQ", category: "Kesadaran Diri", text: "Saya menyadari bagaimana suasana hati memengaruhi keputusan dan tindakan saya.", trait: null },
+            { id: 4, section: "EQ", category: "Kesadaran Diri", text: "Saya dapat membedakan perasaan seperti kecewa, cemas, marah, dan sedih.", trait: null },
+            { id: 5, section: "EQ", category: "Kesadaran Diri", text: "Saya mengetahui kekuatan dan hal yang masih perlu saya kembangkan pada diri sendiri.", trait: null },
+            { id: 6, section: "EQ", category: "Kesadaran Diri", text: "Saya menyadari tanda-tanda ketika tubuh atau pikiran saya mulai mengalami stres.", trait: null },
+
+            { id: 7, section: "EQ", category: "Pengaturan Diri", text: "Saat marah, saya berusaha menenangkan diri sebelum menanggapi keadaan.", trait: null },
+            { id: 8, section: "EQ", category: "Pengaturan Diri", text: "Saya dapat menunda reaksi spontan agar tidak mengatakan sesuatu yang saya sesali.", trait: null },
+            { id: 9, section: "EQ", category: "Pengaturan Diri", text: "Saya memiliki cara yang sehat untuk mengelola stres, misalnya beristirahat atau berbicara dengan orang tepercaya.", trait: null },
+            { id: 10, section: "EQ", category: "Pengaturan Diri", text: "Ketika rencana berubah, saya mampu menyesuaikan diri tanpa terlalu lama larut dalam kekesalan.", trait: null },
+            { id: 11, section: "EQ", category: "Pengaturan Diri", text: "Saya bisa mengakui kesalahan dan berusaha memperbaikinya.", trait: null },
+            { id: 12, section: "EQ", category: "Pengaturan Diri", text: "Saya dapat menjaga komitmen meskipun sedang merasa bosan atau kurang bersemangat.", trait: null },
+
+            { id: 13, section: "EQ", category: "Motivasi", text: "Saya menetapkan tujuan yang jelas dan realistis untuk diri saya.", trait: null },
+            { id: 14, section: "EQ", category: "Motivasi", text: "Ketika mengalami kegagalan, saya berusaha mencari pelajaran yang bisa diambil.", trait: null },
+            { id: 15, section: "EQ", category: "Motivasi", text: "Saya tetap berusaha menyelesaikan tugas meskipun tidak ada orang yang memuji saya.", trait: null },
+            { id: 16, section: "EQ", category: "Motivasi", text: "Saya dapat kembali mencoba setelah hasil pertama tidak sesuai harapan.", trait: null },
+            { id: 17, section: "EQ", category: "Motivasi", text: "Saya memantau kemajuan diri dan menyesuaikan cara belajar atau bekerja jika diperlukan.", trait: null },
+            { id: 18, section: "EQ", category: "Motivasi", text: "Saya berusaha menjaga konsistensi dalam mencapai tujuan jangka panjang.", trait: null },
+
+            { id: 19, section: "EQ", category: "Empati", text: "Saya mendengarkan orang lain sampai selesai sebelum memberikan tanggapan.", trait: null },
+            { id: 20, section: "EQ", category: "Empati", text: "Saya berusaha memahami perasaan orang lain tanpa langsung berasumsi bahwa saya tahu persis yang mereka rasakan.", trait: null },
+            { id: 21, section: "EQ", category: "Empati", text: "Sebelum menilai tindakan seseorang, saya mencoba melihat situasi dari sudut pandangnya.", trait: null },
+            { id: 22, section: "EQ", category: "Empati", text: "Saya memperhatikan nada suara dan bahasa tubuh untuk memahami keadaan orang lain.", trait: null },
+            { id: 23, section: "EQ", category: "Empati", text: "Saya menghargai bahwa orang lain dapat memiliki perasaan dan pandangan yang berbeda dari saya.", trait: null },
+            { id: 24, section: "EQ", category: "Empati", text: "Saya berusaha membantu orang yang sedang kesulitan dengan tetap menghormati kebutuhan mereka.", trait: null },
+
+            { id: 25, section: "EQ", category: "Keterampilan Sosial", text: "Saya dapat menyampaikan pendapat dengan jelas dan tetap menghargai lawan bicara.", trait: null },
+            { id: 26, section: "EQ", category: "Keterampilan Sosial", text: "Ketika terjadi konflik, saya berusaha mencari penyelesaian yang adil daripada memperkeruh keadaan.", trait: null },
+            { id: 27, section: "EQ", category: "Keterampilan Sosial", text: "Saya dapat memberi kritik atau saran dengan cara yang sopan dan membangun.", trait: null },
+            { id: 28, section: "EQ", category: "Keterampilan Sosial", text: "Saya bisa bekerja sama dengan orang yang memiliki gaya kerja berbeda.", trait: null },
+            { id: 29, section: "EQ", category: "Keterampilan Sosial", text: "Jika tidak memahami maksud seseorang, saya bersedia bertanya untuk memperjelasnya.", trait: null },
+            { id: 30, section: "EQ", category: "Keterampilan Sosial", text: "Saya berusaha menjaga hubungan dengan komunikasi yang jujur dan saling menghormati.", trait: null },
+
+            // BAGIAN B — 30 soal kepribadian. Tiap pasangan dimensi memiliki jumlah soal seimbang.
+            // E/I: masing-masing empat pernyataan.
+            { id: 31, section: "Kepribadian", axis: "Energi dan interaksi (E/I)", category: "Kepribadian", text: "Saya mendapatkan energi ketika berinteraksi dan bertukar ide dengan banyak orang.", trait: "E" },
+            { id: 32, section: "Kepribadian", axis: "Energi dan interaksi (E/I)", category: "Kepribadian", text: "Setelah banyak bersosialisasi, saya biasanya membutuhkan waktu sendiri untuk mengisi energi.", trait: "I" },
+            { id: 33, section: "Kepribadian", axis: "Energi dan interaksi (E/I)", category: "Kepribadian", text: "Saya sering memahami gagasan saya dengan membicarakannya bersama orang lain.", trait: "E" },
+            { id: 34, section: "Kepribadian", axis: "Energi dan interaksi (E/I)", category: "Kepribadian", text: "Saya lebih nyaman memikirkan sesuatu terlebih dahulu sebelum membagikan pendapat.", trait: "I" },
+            { id: 35, section: "Kepribadian", axis: "Energi dan interaksi (E/I)", category: "Kepribadian", text: "Saya menikmati kegiatan kelompok yang memungkinkan saya terlibat aktif.", trait: "E" },
+            { id: 36, section: "Kepribadian", axis: "Energi dan interaksi (E/I)", category: "Kepribadian", text: "Saya menikmati waktu tenang untuk fokus pada minat atau pekerjaan saya sendiri.", trait: "I" },
+            { id: 37, section: "Kepribadian", axis: "Energi dan interaksi (E/I)", category: "Kepribadian", text: "Dalam lingkungan baru, saya cukup sering memulai percakapan terlebih dahulu.", trait: "E" },
+            { id: 38, section: "Kepribadian", axis: "Energi dan interaksi (E/I)", category: "Kepribadian", text: "Saya lebih menyukai percakapan mendalam dengan sedikit orang daripada banyak perkenalan singkat.", trait: "I" },
+
+            // N/S: masing-masing empat pernyataan.
+            { id: 39, section: "Kepribadian", axis: "Informasi dan cara memahami (N/S)", category: "Kepribadian", text: "Saya sering mencari pola, hubungan, atau makna di balik berbagai kejadian.", trait: "N" },
+            { id: 40, section: "Kepribadian", axis: "Informasi dan cara memahami (N/S)", category: "Kepribadian", text: "Saya lebih mudah memahami sesuatu melalui fakta, rincian, dan contoh yang nyata.", trait: "S" },
+            { id: 41, section: "Kepribadian", axis: "Informasi dan cara memahami (N/S)", category: "Kepribadian", text: "Saya senang membayangkan kemungkinan dan skenario masa depan yang berbeda.", trait: "N" },
+            { id: 42, section: "Kepribadian", axis: "Informasi dan cara memahami (N/S)", category: "Kepribadian", text: "Saya biasanya memusatkan perhatian pada hal yang dapat diamati dan dialami secara langsung.", trait: "S" },
+            { id: 43, section: "Kepribadian", axis: "Informasi dan cara memahami (N/S)", category: "Kepribadian", text: "Saat menghadapi masalah, saya suka mengeksplorasi banyak kemungkinan solusi.", trait: "N" },
+            { id: 44, section: "Kepribadian", axis: "Informasi dan cara memahami (N/S)", category: "Kepribadian", text: "Saya lebih percaya pada metode yang sudah terbukti lewat pengalaman nyata.", trait: "S" },
+            { id: 45, section: "Kepribadian", axis: "Informasi dan cara memahami (N/S)", category: "Kepribadian", text: "Saya tertarik membahas konsep, simbol, dan arti yang tersirat dari suatu hal.", trait: "N" },
+            { id: 46, section: "Kepribadian", axis: "Informasi dan cara memahami (N/S)", category: "Kepribadian", text: "Saya lebih mudah menjelaskan ide dengan contoh praktis yang dapat diterapkan.", trait: "S" },
+
+            // T/F: masing-masing empat pernyataan.
+            { id: 47, section: "Kepribadian", axis: "Dasar pengambilan keputusan (T/F)", category: "Kepribadian", text: "Saat mengambil keputusan, saya terutama mempertimbangkan logika dan konsistensi alasan.", trait: "T" },
+            { id: 48, section: "Kepribadian", axis: "Dasar pengambilan keputusan (T/F)", category: "Kepribadian", text: "Saat mengambil keputusan, saya memberi perhatian besar pada nilai pribadi dan dampaknya bagi orang lain.", trait: "F" },
+            { id: 49, section: "Kepribadian", axis: "Dasar pengambilan keputusan (T/F)", category: "Kepribadian", text: "Dalam perbedaan pendapat, saya cenderung menilai kekuatan alasan dan bukti yang tersedia.", trait: "T" },
+            { id: 50, section: "Kepribadian", axis: "Dasar pengambilan keputusan (T/F)", category: "Kepribadian", text: "Dalam perbedaan pendapat, saya ingin memastikan orang-orang merasa didengar dan dihargai.", trait: "F" },
+            { id: 51, section: "Kepribadian", axis: "Dasar pengambilan keputusan (T/F)", category: "Kepribadian", text: "Saya lebih menyukai umpan balik yang langsung, objektif, dan berfokus pada masalah.", trait: "T" },
+            { id: 52, section: "Kepribadian", axis: "Dasar pengambilan keputusan (T/F)", category: "Kepribadian", text: "Saya biasanya mempertimbangkan nilai-nilai pribadi dan empati ketika memilih tindakan.", trait: "F" },
+            { id: 53, section: "Kepribadian", axis: "Dasar pengambilan keputusan (T/F)", category: "Kepribadian", text: "Bagi saya, keadilan sering berarti menerapkan prinsip yang konsisten untuk semua orang.", trait: "T" },
+            { id: 54, section: "Kepribadian", axis: "Dasar pengambilan keputusan (T/F)", category: "Kepribadian", text: "Saat menilai suatu keputusan, saya juga memikirkan pengaruhnya terhadap hubungan dan kesejahteraan orang.", trait: "F" },
+
+            // J/P: masing-masing tiga pernyataan.
+            { id: 55, section: "Kepribadian", axis: "Gaya mengatur aktivitas (J/P)", category: "Kepribadian", text: "Saya merasa terbantu ketika tugas direncanakan dan diurutkan sejak awal.", trait: "J" },
+            { id: 56, section: "Kepribadian", axis: "Gaya mengatur aktivitas (J/P)", category: "Kepribadian", text: "Saya lebih suka rencana yang fleksibel dan dapat berubah sesuai keadaan.", trait: "P" },
+            { id: 57, section: "Kepribadian", axis: "Gaya mengatur aktivitas (J/P)", category: "Kepribadian", text: "Saya merasa lega ketika keputusan sudah dibuat dan tugas dapat ditandai selesai.", trait: "J" },
+            { id: 58, section: "Kepribadian", axis: "Gaya mengatur aktivitas (J/P)", category: "Kepribadian", text: "Saya cenderung menjaga beberapa pilihan tetap terbuka sampai memperoleh informasi tambahan.", trait: "P" },
+            { id: 59, section: "Kepribadian", axis: "Gaya mengatur aktivitas (J/P)", category: "Kepribadian", text: "Saya suka membagi tujuan besar menjadi jadwal, langkah, dan tenggat yang jelas.", trait: "J" },
+            { id: 60, section: "Kepribadian", axis: "Gaya mengatur aktivitas (J/P)", category: "Kepribadian", text: "Saya biasanya menyesuaikan prioritas seiring pekerjaan dan situasi berkembang.", trait: "P" }
+        ];
+
+        // Likert scale options with score mapping
+        const likertOptions = [
+            { label: "Sangat Tidak Setuju", score: 1 },
+            { label: "Tidak Setuju", score: 2 },
+            { label: "Netral", score: 3 },
+            { label: "Setuju", score: 4 },
+            { label: "Sangat Setuju", score: 5 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let radarChartInstance = null;
+
+        // UI Element Selectors
+        const viewWelcome = document.getElementById('view-welcome');
+        const viewQuiz = document.getElementById('view-quiz');
+        const viewResults = document.getElementById('view-results');
+        const progressIndicator = document.getElementById('progress-indicator');
+        const currentQNumSpan = document.getElementById('current-q-num');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const progressPercent = document.getElementById('progress-percent');
+        const categoryBadge = document.getElementById('category-badge');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const nextBtnText = document.getElementById('next-btn-text');
+
+        function showModal(title, message) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.remove('flex');
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+
+        function startQuiz() {
+            viewWelcome.classList.add('hidden');
+            viewResults.classList.add('hidden');
+            viewQuiz.classList.remove('hidden');
+            progressIndicator.classList.remove('hidden');
+            currentQuestionIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+            currentQNumSpan.innerText = currentQuestionIndex + 1;
+            categoryBadge.innerText = q.section === "EQ" ? `Tes EQ • ${q.category}` : `Tes Kepribadian • ${q.axis}`;
+            questionText.innerText = `${currentQuestionIndex + 1}. ${q.text}`;
+
+            const percent = Math.round(((currentQuestionIndex) / questions.length) * 100);
+            progressBarFill.style.width = `${percent}%`;
+            progressPercent.innerText = `${percent}% Selesai`;
+
+            optionsContainer.innerHTML = '';
+            likertOptions.forEach(opt => {
+                const isSelected = userAnswers[currentQuestionIndex] === opt.score;
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = `w-full text-left px-5 py-4 rounded-xl border transition flex items-center justify-between ${
+                    isSelected 
+                        ? 'border-indigo-600 bg-indigo-50/60 text-indigo-900 font-semibold shadow-sm' 
+                        : 'border-slate-200 hover:bg-slate-50 text-slate-700 bg-white'
+                }`;
+                button.innerHTML = `
+                    <span class="text-sm sm:text-base">${opt.label}</span>
+                    <span class="w-5 h-5 rounded-full border flex items-center justify-center ${isSelected ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300'}">
+                        ${isSelected ? '<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+                    </span>
+                `;
+                button.onclick = () => selectAnswer(opt.score);
+                optionsContainer.appendChild(button);
+            });
+
+            btnPrev.disabled = currentQuestionIndex === 0;
+            nextBtnText.innerText = currentQuestionIndex === questions.length - 1 ? "Selesai & Lihat Hasil" : "Selanjutnya";
+        }
+
+        function selectAnswer(score) {
+            userAnswers[currentQuestionIndex] = score;
+            renderQuestion();
+            
+            // Auto advance after slight delay for smooth UX if not last question
+            if (currentQuestionIndex < questions.length - 1) {
+                setTimeout(() => {
+                    nextQuestion();
+                }, 250);
+            }
+        }
+
+        function nextQuestion() {
+            if (userAnswers[currentQuestionIndex] === null) {
+                showModal('Pilihan Belum Dipilih', 'Silakan pilih salah satu skala jawaban terlebih dahulu untuk melanjutkan.');
+                return;
+            }
+
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                calculateResults();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        function calculateResults() {
+            viewQuiz.classList.add('hidden');
+            progressIndicator.classList.add('hidden');
+            viewResults.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Bagian EQ dan kepribadian dinilai secara terpisah agar skor tidak saling memengaruhi.
+            const pillarScores = {
+                "Kesadaran Diri": 0,
+                "Pengaturan Diri": 0,
+                "Motivasi": 0,
+                "Empati": 0,
+                "Keterampilan Sosial": 0
+            };
+
+            const pillarCounts = {
+                "Kesadaran Diri": 0,
+                "Pengaturan Diri": 0,
+                "Motivasi": 0,
+                "Empati": 0,
+                "Keterampilan Sosial": 0
+            };
+
+            // Kepribadian memiliki jumlah pernyataan seimbang pada kedua sisi setiap dimensi.
+            const traitCounts = { E: 0, I: 0, N: 0, S: 0, T: 0, F: 0, J: 0, P: 0 };
+            const traitQuestionCounts = { E: 0, I: 0, N: 0, S: 0, T: 0, F: 0, J: 0, P: 0 };
+
+            questions.forEach((q, idx) => {
+                const score = userAnswers[idx] ?? 3;
+                if (q.section === "EQ") {
+                    pillarScores[q.category] += score;
+                    pillarCounts[q.category]++;
+                } else if (q.section === "Kepribadian" && traitCounts[q.trait] !== undefined) {
+                    traitCounts[q.trait] += score;
+                    traitQuestionCounts[q.trait]++;
+                }
+            });
+
+            // Total EQ hanya memakai 30 soal EQ, bukan soal kepribadian.
+            const totalEQ = Object.values(pillarScores).reduce((a, b) => a + b, 0);
+            const eqQuestionCount = questions.filter(q => q.section === "EQ").length;
+            const maxEQ = eqQuestionCount * 5;
+            const eqPercentage = maxEQ ? (totalEQ / maxEQ) * 100 : 0;
+            document.getElementById('total-eq-score').innerText = totalEQ;
+            document.getElementById('total-eq-max').innerText = maxEQ;
+
+            let eqDesc = "";
+            if (eqPercentage >= 85) {
+                eqDesc = "Skor refleksi EQ Anda tinggi pada pernyataan ini. Anda cukup sering melaporkan kemampuan mengenali dan mengelola emosi serta berhubungan dengan orang lain.";
+            } else if (eqPercentage >= 70) {
+                eqDesc = "Skor refleksi EQ Anda tergolong baik. Beberapa kebiasaan emosional dan sosial tampak sudah berkembang, dengan ruang untuk terus berlatih.";
+            } else if (eqPercentage >= 52) {
+                eqDesc = "Skor refleksi EQ Anda berada di rentang sedang. Anda dapat memilih satu atau dua pilar untuk dikembangkan melalui latihan sehari-hari.";
+            } else {
+                eqDesc = "Jawaban menunjukkan beberapa keterampilan EQ yang mungkin masih perlu dilatih. Anggap hasil ini sebagai titik awal refleksi, bukan label diri.";
+            }
+            document.getElementById('eq-level-desc').innerText = eqDesc;
+
+            // Rata-rata tiap trait agar jumlah pertanyaan pada masing-masing sisi sebanding.
+            const traitAverages = {};
+            Object.keys(traitCounts).forEach(trait => {
+                traitAverages[trait] = traitQuestionCounts[trait] > 0
+                    ? traitCounts[trait] / traitQuestionCounts[trait]
+                    : 0;
+            });
+
+            // X dipakai jika skor kedua sisi suatu dimensi sama, alih-alih memaksakan huruf tertentu.
+            const chooseDimension = (firstScore, secondScore, firstLetter, secondLetter) => {
+                return firstScore > secondScore ? firstLetter : secondLetter;
+            };
+            const dim1 = chooseDimension(traitAverages.E, traitAverages.I, "E", "I");
+            const dim2 = chooseDimension(traitAverages.N, traitAverages.S, "N", "S");
+            const dim3 = chooseDimension(traitAverages.T, traitAverages.F, "T", "F");
+            const dim4 = chooseDimension(traitAverages.J, traitAverages.P, "J", "P");
+            const typeCode = dim1 + dim2 + dim3 + dim4;
+            const personalityAxes = [
+                { label: "Energi dan interaksi", first: "E", second: "I", result: dim1 },
+                { label: "Cara memahami informasi", first: "N", second: "S", result: dim2 },
+                { label: "Dasar pengambilan keputusan", first: "T", second: "F", result: dim3 },
+                { label: "Gaya mengatur aktivitas", first: "J", second: "P", result: dim4 }
+            ];
+
+            const typeNames = {
+                "INTJ": "The Architect (Arsitek Strategis)",
+                "INTP": "The Logician (Pemikir Inovatif)",
+                "ENTJ": "The Commander (Pemimpin Visioner)",
+                "ENTP": "The Debater (Pencetus Ide Dinamis)",
+                "INFJ": "The Advocate (Pendukung Idealistis)",
+                "INFP": "The Mediator (Penyembuh Empatik)",
+                "ENFJ": "The Protagonist (Pemimpin Karismatik)",
+                "ENFP": "The Campaigner (Penggerak Inspiratif)",
+                "ISTJ": "The Logistician (Pengabdi Andal)",
+                "ISFJ": "The Defender (Pelindung Setia)",
+                "ESTJ": "The Executive (Pengelola Terstruktur)",
+                "ESFJ": "The Consul (Pemberi Dukungan Sosial)",
+                "ISTP": "The Virtuoso (Ahli Analisis Praktis)",
+                "ISFP": "The Adventurer (Seniman Fleksibel)",
+                "ESTP": "The Entrepreneur (Pengambil Risiko Tangguh)",
+                "ESFP": "The Entertainer (Penghibur Antusias)"
+            };
+
+            document.getElementById('personality-type-code').innerText = typeCode;
+            document.getElementById('personality-type-name').innerText = typeCode.includes("X")
+                ? "Kecenderungan campuran / seimbang"
+                : (typeNames[typeCode] || "Profil kepribadian");
+
+            const axisDescriptions = personalityAxes.map(axis => {
+                if (axis.result === "X") return `${axis.label} cenderung seimbang antara ${axis.first} dan ${axis.second}`;
+                return `${axis.label} lebih condong ke ${axis.result}`;
+            });
+            const personalityDesc = `Kode ini adalah perkiraan berdasarkan jawaban Anda, bukan tipe psikologi resmi. ${axisDescriptions.join("; ")}. Skor yang berdekatan dapat menunjukkan bahwa kecenderungan Anda bergantung pada situasi.`;
+            document.getElementById('personality-summary-desc').innerText = personalityDesc;
+
+            const personalityBreakdown = document.getElementById('personality-breakdown');
+            personalityBreakdown.innerHTML = '';
+            personalityAxes.forEach(axis => {
+                const firstAverage = traitAverages[axis.first];
+                const secondAverage = traitAverages[axis.second];
+                const item = document.createElement('div');
+                item.className = 'space-y-2';
+                item.innerHTML = `
+                    <div class="text-xs font-semibold text-slate-600">${axis.label}</div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1"><span>${axis.first}</span><span>${firstAverage.toFixed(2)} / 5</span></div>
+                            <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full" style="width:${(firstAverage / 5) * 100}%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1"><span>${axis.second}</span><span>${secondAverage.toFixed(2)} / 5</span></div>
+                            <div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-violet-400 rounded-full" style="width:${(secondAverage / 5) * 100}%"></div></div>
+                        </div>
+                    </div>`;
+                personalityBreakdown.appendChild(item);
+            });
+
+            // Render Pillars Breakdown
+            const pillarsContainer = document.getElementById('pillars-breakdown');
+            pillarsContainer.innerHTML = '';
+            const radarLabels = [];
+            const radarData = [];
+
+            for (const [pillar, score] of Object.entries(pillarScores)) {
+                const maxScore = pillarCounts[pillar] * 5;
+                const percentage = Math.round((score / maxScore) * 100);
+                radarLabels.push(pillar);
+                radarData.push(percentage);
+
+                const item = document.createElement('div');
+                item.className = 'space-y-1.5';
+                item.innerHTML = `
+                    <div class="flex justify-between text-xs sm:text-sm font-medium">
+                        <span class="text-slate-700">${pillar}</span>
+                        <span class="text-indigo-600 font-semibold">${score} / ${maxScore} (${percentage}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                pillarsContainer.appendChild(item);
+            }
+
+            // Render Radar Chart
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if (radarChartInstance) {
+                radarChartInstance.destroy();
+            }
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: radarLabels,
+                    datasets: [{
+                        label: 'Persentase Dimensi (%)',
+                        data: radarData,
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: 'rgb(99, 102, 241)',
+                        pointBackgroundColor: 'rgb(79, 70, 229)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(79, 70, 229)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(226, 232, 240, 0.8)' },
+                            grid: { color: 'rgba(226, 232, 240, 0.8)' },
+                            pointLabels: {
+                                font: { family: 'Inter', size: 11, weight: '500' },
+                                color: '#475569'
+                            },
+                            ticks: { display: false, max: 100, min: 0 }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Recommendations
+            const recDiv = document.getElementById('recommendation-text');
+            recDiv.innerHTML = `
+                <p>1. <strong>Pengembangan Kesadaran Diri:</strong> Luangkan waktu 5–10 menit setiap hari untuk melakukan refleksi jurnal atas emosi yang paling dominan muncul selama beraktivitas.</p>
+                <p>2. <strong>Manajemen Stres & Regulasi:</strong> Latih teknik pernapasan terarah saat menghadapi situasi mendadak untuk mempertahankan kejernihan berpikir.</p>
+                <p>3. <strong>Kenali kecenderungan ${typeCode}:</strong> Gunakan ringkasan kepribadian sebagai bahan refleksi, bukan batasan. Anda tetap dapat mengembangkan cara berkomunikasi dan mengambil keputusan.</p>
+            `;
+        }
+
+        function resetQuiz() {
+            userAnswers = new Array(questions.length).fill(null);
+            currentQuestionIndex = 0;
+            viewResults.classList.add('hidden');
+            viewWelcome.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
